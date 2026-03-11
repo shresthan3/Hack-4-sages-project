@@ -20,8 +20,9 @@ from ModelGen import compute_luminosity, compute_habitable_zone
 # ============================================================
 # SAVE PATHS
 # ============================================================
-MODEL_FILE = "habitability_model.joblib"
-FEATURES_FILE = "habitability_feature_columns.joblib"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+MODEL_FILE = os.path.join(BASE_DIR, "habitability_model.joblib")
+FEATURES_FILE = os.path.join(BASE_DIR, "habitability_feature_columns.joblib")
 
 # ============================================================
 # NASA TRAINING DATA
