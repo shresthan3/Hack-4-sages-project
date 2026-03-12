@@ -4,9 +4,10 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft, Book } from "lucide-react";
-import { getStarData, type Planet, type Star } from "../../../data/starData";
+import type { Planet, Star } from "../../../data/starData";
 import { StarVisualization } from "../../../components/StarVisualization";
 import { PlanetPanel } from "../../../components/PlanetPanel";
+import { fetchStar } from "../../../lib/api";
 
 export default function StarSystemPage() {
   const params = useParams<{ starName: string }>();
@@ -20,15 +21,17 @@ export default function StarSystemPage() {
     if (!rawName) return;
 
     const decoded = decodeURIComponent(rawName as string);
-    const starData = getStarData(decoded);
-    if (!starData) {
-      router.replace("/");
-      return;
-    }
-    setStar(starData);
-    if (starData.planets.length > 0) {
-      setSelectedPlanet(starData.planets[0]);
-    }
+
+    fetchStar(decoded)
+      .then((starData) => {
+        setStar(starData);
+        if (starData.planets.length > 0) {
+          setSelectedPlanet(starData.planets[0]);
+        }
+      })
+      .catch(() => {
+        router.replace("/");
+      });
   }, [params, router]);
 
   if (!star) {
