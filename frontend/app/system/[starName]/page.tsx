@@ -13,6 +13,7 @@ export default function StarSystemPage() {
   const params = useParams<{ starName: string }>();
   const router = useRouter();
   const [star, setStar] = useState<Star | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [selectedPlanet, setSelectedPlanet] = useState<Planet | null>(null);
   const [showPanel, setShowPanel] = useState(true);
 
@@ -30,9 +31,25 @@ export default function StarSystemPage() {
         }
       })
       .catch(() => {
-        router.replace("/");
+        setError("Star not found in database.");
       });
   }, [params, router]);
+
+  if (error) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[#0B1026]">
+        <div className="max-w-md rounded-lg border border-[#6E7BAA]/20 bg-[#1A2142] p-6 text-center">
+          <div className="mb-4 text-lg font-semibold text-white">{error}</div>
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 rounded-lg bg-[#4BE37A] px-4 py-2 font-semibold text-[#0B1026] transition-colors hover:bg-[#3BC366]"
+          >
+            Return to Explorer
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   if (!star) {
     return (

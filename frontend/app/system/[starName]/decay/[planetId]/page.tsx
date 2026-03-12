@@ -18,6 +18,7 @@ export default function PlanetDecayPage() {
 
   const [star, setStar] = useState<Star | null>(null);
   const [planet, setPlanet] = useState<Planet | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [decayPoints, setDecayPoints] = useState<DecayPoint[]>([]);
   const [initialScore, setInitialScore] = useState<number | null>(null);
   const [decayConstant, setDecayConstant] = useState<number | null>(null);
@@ -63,7 +64,7 @@ export default function PlanetDecayPage() {
         setHzOuter(decay.hz_outer);
       })
       .catch(() => {
-        router.replace("/");
+        setError("Star not found in database.");
       });
   }, [params, router]);
 
@@ -125,6 +126,22 @@ export default function PlanetDecayPage() {
 
   const clearHover = () => setHoverPoint(null);
 
+  if (error) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[#0B1026]">
+        <div className="max-w-md rounded-lg border border-[#6E7BAA]/20 bg-[#1A2142] p-6 text-center">
+          <div className="mb-4 text-lg font-semibold text-white">{error}</div>
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 rounded-lg bg-[#4BE37A] px-4 py-2 font-semibold text-[#0B1026] transition-colors hover:bg-[#3BC366]"
+          >
+            Return to Explorer
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   if (!star || !planet) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#0B1026]">
@@ -146,15 +163,15 @@ export default function PlanetDecayPage() {
           </Link>
           <div className="text-sm text-gray-400">
             Habitability over time for{" "}
-            <span className="font-semibold text-[#4BE37A]">
-              {planet.planet_name}
-            </span>
-          </div>
-        </div>
-      </header>
-
-      <main className="mx-auto max-w-5xl px-6 py-8 space-y-8">
-        <section className="grid gap-6 md:grid-cols-[2fr,1fr]">
+                <div className="font-semibold text-[#4BE37A]">
+                    t = {hoverPoint.t.toFixed(2)} Gyr
+                  </div>
+                  <div>
+                    H(t) ≈{" "}
+                    <span className="font-semibold">
+                      {hoverPoint.h.toFixed(2)}%
+                    </span>
+                  </div>
           <div className="rounded-lg border border-[#6E7BAA]/20 bg-[#1A2142] p-5">
             <h1 className="mb-1 text-2xl font-semibold text-[#4BE37A]">
               Habitability Decay Curve
@@ -276,7 +293,7 @@ export default function PlanetDecayPage() {
                 </div>
                 <div className="text-lg font-semibold text-white">
                   {initialScore !== null
-                    ? `${initialScore.toFixed(1)}%`
+                    ? `${initialScore.toFixed(2)}%`
                     : "—"}
                 </div>
               </div>
@@ -349,7 +366,7 @@ export default function PlanetDecayPage() {
                 <div className="flex justify-between">
                   <span className="text-gray-400">Current habitability:</span>
                   <span className="text-white">
-                    {planet.planet_habitability_score}%
+                    {planet.planet_habitability_score.toFixed(2)}%
                   </span>
                 </div>
               </div>

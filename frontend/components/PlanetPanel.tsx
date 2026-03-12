@@ -278,10 +278,10 @@ export function PlanetPanel({
                 <div className="mb-2 flex justify-between">
                   <span className="text-gray-400">Overall Habitability:</span>
                   <span className="text-white">
-                    {selectedPlanet.planet_habitability_score}%
+                    {selectedPlanet.planet_habitability_score.toFixed(2)}%
                   </span>
                 </div>
-                <Progress value={selectedPlanet.planet_habitability_score} />
+                <Progress value={Number(selectedPlanet.planet_habitability_score.toFixed(2))} />
                 <p className="mt-1 text-xs text-gray-500">ML-based score</p>
               </div>
             </div>
