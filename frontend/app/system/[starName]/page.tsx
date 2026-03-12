@@ -119,16 +119,17 @@ export default function StarSystemPage() {
           <span className="text-[#4BE37A]">✦</span> Legend
         </h3>
         <div className="space-y-2 text-xs">
+          {/* ring legend entry */}
           <div className="flex items-center gap-2">
-            <div className="h-3 w-3 rounded-full bg-[#4BE37A]" />
+            <div className="h-3 w-3 rounded-full border-2 border-[#4BE37A]" />
             <span className="text-gray-300">
-              Inside HZ (Prebiotic UV: Yes)
+              Green ring = prebiotic UV window
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="h-3 w-3 rounded-full bg-[#7BE3A7]" />
+            <div className="h-3 w-3 rounded-full bg-[#4BE37A]" />
             <span className="text-gray-300">
-              Inside HZ (Prebiotic UV: No)
+              Inside HZ
             </span>
           </div>
           <div className="flex items-center gap-2">

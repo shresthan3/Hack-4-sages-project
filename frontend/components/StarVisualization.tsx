@@ -158,6 +158,15 @@ export function StarVisualization({
       ctx.arc(planetX, planetY, planetSize, 0, 2 * Math.PI);
       ctx.fill();
 
+      // draw a colored ring around planets that fall in the prebiotic UV window
+      if (planet.planet_prebiotic_uv) {
+        ctx.strokeStyle = "#4BE37A"; // same green used elsewhere
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(planetX, planetY, planetSize + 2, 0, 2 * Math.PI);
+        ctx.stroke();
+      }
+
       if (planet.planet_rockiness === "Rocky (textured)") {
         ctx.strokeStyle = "rgba(0,0,0,0.2)";
         ctx.lineWidth = 0.5;

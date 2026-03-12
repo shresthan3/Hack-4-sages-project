@@ -10,6 +10,7 @@ from ModelHabitibilityScore import (
 )
 from ModelGen import compute_luminosity, compute_habitable_zone, compute_esi, rocky_note
 from ModelUVC import make_uv_templates, choose_template, compute_uvc_flux, classify_uvc
+from ModelMagnetosphere import get_magnetosphere_data_for_star, build_magnetosphere_report
 from ModelDecayHabit import compute_decay_constant, generate_habitability_curve
 
 
@@ -193,5 +194,47 @@ def get_planet_decay(
         "uvc_flux": _safe_float(uvc_flux, None),
         "hz_inner": _safe_float(hz_inner, None),
         "hz_outer": _safe_float(hz_outer, None),
+    }
+
+
+@app.get("/star/{hostname}/planet/{planet_name}/magnetosphere")
+def get_planet_magnetosphere(
+    hostname: str,
+    planet_name: str,
+):
+    """
+    Return magnetosphere information for a specific planet.
+
+    Uses ModelMagnetosphere to compute a star-level summary plus
+    a per-planet magnetosphere row. The frontend uses this to display
+    fields like spin period, wind pressure, magnetopause size, and a
+    simple shielding interpretation.
+    """
+    df = get_magnetosphere_data_for_star(hostname)
+    if df.empty:
+        raise HTTPException(status_code=404, detail="Star not found")
+
+    star_info, report_df = build_magnetosphere_report(df)
+
+    planet_rows = report_df[report_df["Planet"] == planet_name]
+    if planet_rows.empty:
+        raise HTTPException(status_code=404, detail="Planet not found for this star")
+
+    row = planet_rows.iloc[0]
+
+    return {
+        "star_info": star_info,
+        "magnetosphere": {
+            "planet_type": row["Planet type"],
+            "orbit_au": _safe_float(row.get("Orbit (AU)")),
+            "orbital_period": _safe_float(row.get("Orbital period (days)")),
+            "rotation_hours": _safe_float(row.get("Rotation used (hours)")),
+            "rotation_assumption": row.get("Rotation assumption"),
+            "wind_pressure": _safe_float(row.get("Wind pressure (Pa)")),
+            "dipole_moment": _safe_float(row.get("Dipole moment (A m^2)")),
+            "surface_field_ut": _safe_float(row.get("Surface field (uT)")),
+            "magnetopause_rp": _safe_float(row.get("Magnetopause (Rp)")),
+            "shielding": row.get("Shielding"),
+        },
     }
 

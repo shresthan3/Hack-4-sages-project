@@ -318,12 +318,12 @@ export function PlanetPanel({
                   router.push(
                     `/system/${encodeURIComponent(
                       star.name
-                    )}/decay/${encodeURIComponent(selectedPlanet.id)}`
+                    )}/magnetosphere/${encodeURIComponent(selectedPlanet.id)}`
                   )
                 }
-                className="rounded-lg bg-[#4BE37A] px-4 py-2 text-sm font-semibold text-[#0B1026] transition-colors hover:bg-[#3BC366]"
+                className="w-full rounded-lg bg-[#4BE37A] px-6 py-3 text-sm font-semibold text-[#0B1026] transition-colors hover:bg-[#3BC366]"
               >
-                View Habitability Over Time
+                Magnetosphere Information and Habitability Through Time
               </button>
             </div>
           </div>

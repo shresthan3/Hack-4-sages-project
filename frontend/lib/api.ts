@@ -31,6 +31,30 @@ export interface PlanetDecayResponse {
   hz_outer: number | null;
 }
 
+export interface PlanetMagnetosphereResponse {
+  star_info: {
+    hostname: string;
+    spectral_type: string | null;
+    stellar_mass: number | null;
+    stellar_age: number | null;
+    luminosity: number | null;
+    hz_inner: number | null;
+    hz_outer: number | null;
+  };
+  magnetosphere: {
+    planet_type: string;
+    orbit_au?: number | null;
+    orbital_period?: number | null;
+    rotation_hours?: number | null;
+    rotation_assumption?: string;
+    wind_pressure?: number | null;
+    dipole_moment?: number | null;
+    surface_field_ut?: number | null;
+    magnetopause_rp?: number | null;
+    shielding?: string;
+  };
+}
+
 export async function fetchPlanetDecay(
   starName: string,
   planetName: string,
@@ -57,6 +81,22 @@ export async function fetchPlanetDecay(
     throw new Error("Decay data not available");
   }
 
+  return res.json();
+}
+
+export async function fetchPlanetMagnetosphere(
+  starName: string,
+  planetName: string
+): Promise<PlanetMagnetosphereResponse> {
+  const res = await fetch(
+    `${BASE_URL}/star/${encodeURIComponent(starName)}/planet/${encodeURIComponent(
+      planetName
+    )}/magnetosphere`,
+    { cache: "no-store" }
+  );
+  if (!res.ok) {
+    throw new Error("Magnetosphere data not available");
+  }
   return res.json();
 }
 
