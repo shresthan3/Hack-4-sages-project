@@ -1,6 +1,7 @@
-"use client";
+ "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Filter, X } from "lucide-react";
 import type { Planet, Star } from "../data/starData";
 import { Progress } from "./ui/progress";
@@ -19,6 +20,7 @@ export function PlanetPanel({
   onPlanetSelect,
   onClose
 }: PlanetPanelProps) {
+  const router = useRouter();
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState({
     rocky: false,
@@ -308,6 +310,21 @@ export function PlanetPanel({
                   {selectedPlanet.planet_uv_flux.toFixed(2)} W/m²
                 </span>
               </div>
+            </div>
+            <div className="mt-4 flex justify-end">
+              <button
+                type="button"
+                onClick={() =>
+                  router.push(
+                    `/system/${encodeURIComponent(
+                      star.name
+                    )}/decay/${encodeURIComponent(selectedPlanet.id)}`
+                  )
+                }
+                className="rounded-lg bg-[#4BE37A] px-4 py-2 text-sm font-semibold text-[#0B1026] transition-colors hover:bg-[#3BC366]"
+              >
+                View Habitability Over Time
+              </button>
             </div>
           </div>
         </motion.div>

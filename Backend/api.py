@@ -10,6 +10,7 @@ from ModelHabitibilityScore import (
 )
 from ModelGen import compute_luminosity, compute_habitable_zone, compute_esi, rocky_note
 from ModelUVC import make_uv_templates, choose_template, compute_uvc_flux, classify_uvc
+from ModelDecayHabit import compute_decay_constant, generate_habitability_curve
 
 
 app = FastAPI()
@@ -139,5 +140,58 @@ def get_star(hostname: str):
         "hz_inner": _safe_float(hz_inner, 0.0),
         "hz_outer": _safe_float(hz_outer, 0.0),
         "planets": planets,
+    }
+
+
+@app.get("/star/{hostname}/planet/{planet_name}/decay")
+def get_planet_decay(
+    hostname: str,
+    planet_name: str,
+    max_time: float = 10.0,
+    points: int = 300,
+):
+    """
+    Return habitability decay curve for a specific planet in a star system.
+
+    Used by the frontend to plot how the ML-based habitability score changes
+    over time using the decay model from ModelDecayHabit.py.
+    """
+    df = get_planets_for_star(hostname)
+    if df.empty:
+        raise HTTPException(status_code=404, detail="Star not found")
+
+    # Match planet by its catalog name (same as pl_name)
+    planet_rows = df[df["pl_name"] == planet_name]
+    if planet_rows.empty:
+        raise HTTPException(status_code=404, detail="Planet not found for this star")
+
+    # Predict current habitability scores for all planets in this system
+    feature_df, feature_cols_local = build_feature_table(df)
+    X = feature_df[feature_cols_local]
+    all_scores = np.clip(model.predict(X), 0, 100)
+
+    # Index of the selected planet within the dataframe
+    planet_index = planet_rows.index[0]
+    try:
+        position = list(df.index).index(planet_index)
+    except ValueError:
+        raise HTTPException(status_code=500, detail="Internal indexing error")
+
+    H0 = float(all_scores[position])
+
+    # Decay parameters and related diagnostics
+    k, uvc_flux, hz_inner, hz_outer = compute_decay_constant(planet_rows.iloc[0])
+    times, scores = generate_habitability_curve(H0, k, max_time=max_time, points=points)
+
+    return {
+        "planet_name": planet_name,
+        "host_star": hostname,
+        "initial_score": H0,
+        "decay_constant": k,
+        "times": times.tolist(),
+        "scores": scores.tolist(),
+        "uvc_flux": _safe_float(uvc_flux, None),
+        "hz_inner": _safe_float(hz_inner, None),
+        "hz_outer": _safe_float(hz_outer, None),
     }
 
